@@ -34,8 +34,13 @@ jobs:
           node-version: 22
           cache: npm
 
+      # `enablement: true` turns Pages on and sets its build source to GitHub
+      # Actions if that has not been done in repository settings, so the first
+      # deployment does not require a manual step.
       - name: Configure Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - run: npm ci
 
