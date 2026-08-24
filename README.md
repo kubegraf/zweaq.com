@@ -73,10 +73,19 @@ No API key is ever read in the browser.
 
 ## Deployment
 
-Pushing to `main` runs `.github/workflows/deploy.yml`, which gates on typecheck
-and tests, builds the static export, and publishes to GitHub Pages.
+> **One-time setup required.** Pages must be enabled on the repository before
+> the first deployment can succeed. Open
+> **Settings → Pages → Build and deployment → Source** and choose
+> **GitHub Actions**. Creating a Pages site needs repository-admin rights that
+> the workflow token does not have, so this cannot be automated. The deploy
+> workflow prints these instructions in its run summary if it hits this.
 
-The repository's **Settings → Pages → Source** must be set to **GitHub Actions**.
+After that, pushing to `main` runs `.github/workflows/deploy.yml`, which gates on
+typecheck and tests, builds the static export, writes `.nojekyll`, and publishes
+to https://kubegraf.github.io/zweaq.com.
+
+Deploying from a branch other than the default additionally requires that branch
+to be permitted by the `github-pages` environment's protection rules.
 
 ## Licence
 

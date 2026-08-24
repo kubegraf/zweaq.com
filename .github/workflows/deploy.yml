@@ -38,9 +38,34 @@ jobs:
       # Actions if that has not been done in repository settings, so the first
       # deployment does not require a manual step.
       - name: Configure Pages
+        id: pages
         uses: actions/configure-pages@v5
         with:
           enablement: true
+
+      # Creating a Pages site needs repository-admin rights, which the workflow
+      # token does not have unless an owner has granted them. Say exactly what
+      # to do rather than leaving a bare "Resource not accessible by integration".
+      - name: Explain a Pages configuration failure
+        if: failure() && steps.pages.outcome == 'failure'
+        run: |
+          echo "::error title=GitHub Pages is not enabled::A repository admin must enable it once."
+          {
+            echo "### GitHub Pages needs to be switched on"
+            echo
+            echo "This workflow builds the site correctly, but it cannot publish until Pages"
+            echo "is enabled on the repository. Creating a Pages site requires admin rights"
+            echo "that the workflow token does not have."
+            echo
+            echo "**One-time fix, by a repository admin:**"
+            echo
+            echo "1. Open <https://github.com/${{ github.repository }}/settings/pages>"
+            echo "2. Under **Build and deployment → Source**, choose **GitHub Actions**"
+            echo "3. Re-run this workflow"
+            echo
+            echo "The site will then publish to <https://kubegraf.github.io/zweaq.com/>."
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 1
 
       - run: npm ci
 
