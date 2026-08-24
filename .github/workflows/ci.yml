@@ -1,0 +1,126 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+# Cancel superseded runs on the same ref — a stale CI result helps nobody.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Typecheck, lint, unit tests, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit and component tests
+        run: npm test
+
+      - name: Build static export
+        run: npm run build:static
+
+      # The generated brand assets and product renders are committed. If a
+      # generator changes without the output being regenerated, the repository
+      # and the site disagree — catch that here rather than in review.
+      - name: Verify generated assets are up to date
+        run: |
+          npm run gen:brand
+          npm run gen:renders
+          if ! git diff --quiet -- public/brand public/product public/og.png; then
+            echo "::error::Generated assets are stale. Run 'npm run gen:brand && npm run gen:renders' and commit the result."
+            git --no-pager diff --stat -- public/brand public/product public/og.png
+            exit 1
+          fi
+
+      - name: Upload static export
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-export
+          path: out
+          retention-days: 3
+
+  e2e:
+    name: End-to-end
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Build static export
+        run: npm run build:static
+
+      # E2E runs against the real export, served under the same base path
+      # GitHub Pages uses, so it exercises exactly what ships.
+      - name: Run end-to-end tests
+        run: npm run test:e2e
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7
+
+  visual-qa:
+    name: Responsive visual QA
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build:static
+
+      # Fails on horizontal overflow, touch targets under 44px, and text below
+      # 11px, at every target viewport.
+      - name: Responsive audit
+        run: npm run qa:visual
+
+      - name: Upload screenshots
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-qa-screenshots
+          path: qa
+          retention-days: 7

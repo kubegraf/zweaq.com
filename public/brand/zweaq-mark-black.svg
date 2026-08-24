@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="ZWEAQ">
+  <!-- ZWEAQ original brand mark. Geometry: scripts/brand-geometry.mjs -->
+  <defs>
+    <clipPath id="mb-u"><polygon points="-20,-20 63,-20 -20,63"/></clipPath>
+    <clipPath id="mb-l"><polygon points="68,68 68,-15 -15,68"/></clipPath>
+  </defs>
+  <path d="M14,4 H34 A10,10 0 0 1 44,14 V34 A10,10 0 0 1 34,44 H14 A10,10 0 0 1 4,34 V14 A10,10 0 0 1 14,4 Z M18,14 H30 A4,4 0 0 1 34,18 V30 A4,4 0 0 1 30,34 H18 A4,4 0 0 1 14,30 V18 A4,4 0 0 1 18,14 Z" fill="#0A0B0D" fill-rule="evenodd" clip-path="url(#mb-u)"/>
+  <path d="M14,4 H34 A10,10 0 0 1 44,14 V34 A10,10 0 0 1 34,44 H14 A10,10 0 0 1 4,34 V14 A10,10 0 0 1 14,4 Z M18,14 H30 A4,4 0 0 1 34,18 V30 A4,4 0 0 1 30,34 H18 A4,4 0 0 1 14,30 V18 A4,4 0 0 1 18,14 Z" fill="#0A0B0D" fill-rule="evenodd" clip-path="url(#mb-l)"/>
+</svg>
