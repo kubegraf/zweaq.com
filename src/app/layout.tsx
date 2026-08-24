@@ -89,6 +89,7 @@ export const metadata: Metadata = {
     icon: [{ url: siteConfig.asset('/brand/favicon.svg'), type: 'image/svg+xml' }],
     apple: [{ url: siteConfig.asset('/brand/app-icon.svg') }],
   },
+  manifest: siteConfig.asset('/manifest.webmanifest'),
   category: 'technology',
 };
 

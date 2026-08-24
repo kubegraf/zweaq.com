@@ -49,9 +49,9 @@ jobs:
         run: |
           npm run gen:brand
           npm run gen:renders
-          if ! git diff --quiet -- public/brand public/product public/og.png; then
+          if ! git diff --quiet -- public/brand public/icons public/product public/og.png; then
             echo "::error::Generated assets are stale. Run 'npm run gen:brand && npm run gen:renders' and commit the result."
-            git --no-pager diff --stat -- public/brand public/product public/og.png
+            git --no-pager diff --stat -- public/brand public/icons public/product public/og.png
             exit 1
           fi
 

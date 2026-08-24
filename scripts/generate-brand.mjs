@@ -1,5 +1,6 @@
 /** Emits every brand asset from scripts/brand-geometry.mjs. Run: npm run gen:brand */
 import { writeFileSync, mkdirSync } from 'node:fs';
+import sharp from 'sharp';
 import { markBody, wordmarkBody, WORDMARK_W, SVG_NOTE } from './brand-geometry.mjs';
 
 const OUT = new URL('../public/brand/', import.meta.url);
@@ -76,4 +77,37 @@ const files = {
 for (const [name, body] of Object.entries(files)) {
   writeFileSync(new URL(name, OUT), body);
   console.log('  ✓ public/brand/' + name);
+}
+
+/*
+ * Raster launcher icons.
+ *
+ * The manifest points at PNGs rather than the SVG: a number of Android
+ * launchers still ignore SVG icons and fall back to a screenshot of the page,
+ * which looks like a bug rather than a brand.
+ *
+ * The maskable variant carries extra padding so the mark survives being
+ * cropped to whatever shape the launcher applies.
+ */
+const ICONS = new URL('../public/icons/', import.meta.url);
+mkdirSync(ICONS, { recursive: true });
+
+const maskable = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="${INK}"/>
+  <g transform="translate(256 256) scale(5.4) translate(-24 -24)">${markBody('mask', PAPER)}</g>
+</svg>`;
+
+const standard = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="${INK}"/>
+  <g transform="translate(256 256) scale(7.6) translate(-24 -24)">${markBody('std', PAPER)}</g>
+</svg>`;
+
+for (const [name, source, size] of [
+  ['icon-192.png', standard, 192],
+  ['icon-512.png', standard, 512],
+  ['icon-maskable-512.png', maskable, 512],
+]) {
+  await sharp(Buffer.from(source)).resize(size, size).png({ compressionLevel: 9 })
+    .toFile(new URL(name, ICONS).pathname);
+  console.log(`  ✓ public/icons/${name}  ${size}×${size}`);
 }
