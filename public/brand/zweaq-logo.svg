@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 228.4 68" role="img" aria-label="ZWEAQ">
+  <!-- ZWEAQ original brand mark. Geometry: scripts/brand-geometry.mjs -->
+  <g transform="translate(10 10)"><defs>
+    <clipPath id="l-u"><polygon points="-20,-20 63,-20 -20,63"/></clipPath>
+    <clipPath id="l-l"><polygon points="68,68 68,-15 -15,68"/></clipPath>
+  </defs>
+  <path d="M14,4 H34 A10,10 0 0 1 44,14 V34 A10,10 0 0 1 34,44 H14 A10,10 0 0 1 4,34 V14 A10,10 0 0 1 14,4 Z M18,14 H30 A4,4 0 0 1 34,18 V30 A4,4 0 0 1 30,34 H18 A4,4 0 0 1 14,30 V18 A4,4 0 0 1 18,14 Z" fill="currentColor" fill-rule="evenodd" clip-path="url(#l-u)"/>
+  <path d="M14,4 H34 A10,10 0 0 1 44,14 V34 A10,10 0 0 1 34,44 H14 A10,10 0 0 1 4,34 V14 A10,10 0 0 1 14,4 Z M18,14 H30 A4,4 0 0 1 34,18 V30 A4,4 0 0 1 30,34 H18 A4,4 0 0 1 14,30 V18 A4,4 0 0 1 18,14 Z" fill="currentColor" fill-rule="evenodd" clip-path="url(#l-l)"/></g>
+  <g transform="translate(78 10.6) scale(0.78)">
+    <g fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="1.9">
+    <path d="M0,8 H26 L0,40 H26" transform="translate(0 0)"/>
+    <path d="M0,8 L7,40 L17,17 L27,40 L34,8" transform="translate(37 0)"/>
+    <path d="M22,8 H0 V40 H22 M0,24 H17" transform="translate(82 0)"/>
+    <path d="M0,40 L13,8 L26,40 M4.9,28 H21.1" transform="translate(111 0)"/>
+    <path d="M15,8 A15,16 0 1 0 15.01,8 Z M25,34 L34,43" transform="translate(146 0)"/>
+  </g>
+  </g>
+</svg>

@@ -1,0 +1,111 @@
+/**
+ * ZWEAQ design tokens — the single source of truth for the visual system.
+ *
+ * Exposed through Tailwind's `@theme` (which also emits them as plain custom
+ * properties, so hand-written CSS reads the same values). Nothing in the
+ * codebase should introduce a colour, radius, or duration that isn't here.
+ */
+
+@theme {
+  /* ---- Colour -------------------------------------------------------------
+   * Near-black through titanium to paper. One accent — signal — and one
+   * semantic success. Colour never carries meaning alone anywhere on the site.
+   */
+  --color-ink: #08090b;
+  --color-ink-raised: #0e1015;
+  --color-ink-panel: #14171d;
+  --color-ink-inset: #050607;
+
+  --color-ti-100: #eef1f5;
+  --color-ti-200: #d6dce4;
+  --color-ti-300: #c4cbd4;
+  --color-ti-400: #a2abb8;
+  --color-ti-500: #8b95a3;
+  --color-ti-600: #7c8593;
+  --color-ti-700: #565e6b;
+  --color-ti-800: #3a4048;
+  --color-ti-900: #23272d;
+
+  --color-paper: #f4f5f7;
+
+  --color-signal: #f2a75c;
+  --color-signal-dim: #b87c3e;
+  --color-verify: #6fd79a;
+  --color-display: #dff3ff;
+
+  /* ---- Type ---------------------------------------------------------------
+   * Two families. Grotesk carries everything human-readable; mono carries
+   * anything that is data — specs, readouts, labels, the ring display.
+   */
+  --font-sans: var(--font-grotesk), ui-sans-serif, system-ui, -apple-system,
+    'Segoe UI', sans-serif;
+  --font-mono: var(--font-mono-face), ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Fluid display sizes. clamp() means no layout-shifting breakpoint jumps and
+   * no separate mobile type scale to maintain. */
+  --text-display-1: clamp(2.75rem, 1.1rem + 7vw, 7.5rem);
+  --text-display-2: clamp(2.15rem, 1.1rem + 4.6vw, 4.75rem);
+  --text-display-3: clamp(1.75rem, 1.1rem + 2.8vw, 3.25rem);
+  --text-heading: clamp(1.3rem, 1rem + 1.3vw, 1.9rem);
+
+  /* ---- Space --------------------------------------------------------------
+   * Section rhythm is fluid so mobile isn't a squashed desktop. */
+  --spacing-section: clamp(4.5rem, 2.5rem + 8vw, 10rem);
+  --spacing-gutter: clamp(1.25rem, 0.6rem + 2.4vw, 3rem);
+
+  /* ---- Radius -------------------------------------------------------------
+   * Derived from the mark: its outer corner radius is 10/40 = 0.25 of its
+   * height. Panels echo that ratio rather than picking arbitrary numbers. */
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
+
+  /* ---- Motion -------------------------------------------------------------
+   * Three durations, two curves. Every animation on the site uses one of these.
+   * `--ease-out` for things arriving, `--ease-precise` for things a user drove. */
+  --duration-fast: 160ms;
+  --duration-medium: 380ms;
+  --duration-slow: 720ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-precise: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* Tokens Tailwind utilities can't express: hairlines, gradients, shadows. */
+:root {
+  --line: color-mix(in oklab, var(--color-ti-300) 13%, transparent);
+  --line-strong: color-mix(in oklab, var(--color-ti-300) 26%, transparent);
+
+  /* The titanium surface used on hardware renders and metal type. */
+  --grad-titanium: linear-gradient(
+    145deg,
+    #f2f5f9 0%,
+    #b9c1cc 18%,
+    #6f7886 42%,
+    #cbd3dd 58%,
+    #7e8896 76%,
+    #e9eef4 100%
+  );
+
+  /* A single soft key light behind the product. Not a "glowing blob": it is
+   * elliptical, off-centre, and always clipped by its container. */
+  --grad-keylight: radial-gradient(
+    58% 44% at 50% 36%,
+    color-mix(in oklab, var(--color-ti-300) 15%, transparent) 0%,
+    transparent 70%
+  );
+
+  --shadow-panel:
+    0 1px 0 0 color-mix(in oklab, var(--color-ti-100) 6%, transparent) inset,
+    0 24px 60px -32px rgb(0 0 0 / 0.9);
+  --shadow-lift: 0 30px 70px -30px rgb(0 0 0 / 0.85);
+
+  --nav-h: 3.5rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --nav-h: 4.25rem;
+  }
+}

@@ -1,0 +1,107 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+      # The working branch for this build. Deploying from a non-default branch
+      # additionally requires that branch to be permitted by the `github-pages`
+      # environment's protection rules.
+      - claude/zweaq-premium-review-5dkk2h
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time. In-progress runs are allowed to finish rather than
+# being cancelled, so a half-uploaded site is never published.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # `enablement: true` turns Pages on and sets its build source to GitHub
+      # Actions if that has not been done in repository settings, so the first
+      # deployment does not require a manual step.
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      # Creating a Pages site needs repository-admin rights, which the workflow
+      # token does not have unless an owner has granted them. Say exactly what
+      # to do rather than leaving a bare "Resource not accessible by integration".
+      - name: Explain a Pages configuration failure
+        if: failure() && steps.pages.outcome == 'failure'
+        run: |
+          echo "::error title=GitHub Pages is not enabled::A repository admin must enable it once."
+          {
+            echo "### GitHub Pages needs to be switched on"
+            echo
+            echo "This workflow builds the site correctly, but it cannot publish until Pages"
+            echo "is enabled on the repository. Creating a Pages site requires admin rights"
+            echo "that the workflow token does not have."
+            echo
+            echo "**One-time fix, by a repository admin:**"
+            echo
+            echo "1. Open <https://github.com/${{ github.repository }}/settings/pages>"
+            echo "2. Under **Build and deployment → Source**, choose **GitHub Actions**"
+            echo "3. Re-run this workflow"
+            echo
+            echo "The site will then publish to <https://kubegraf.github.io/zweaq.com/>."
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 1
+
+      - run: npm ci
+
+      # Gate the deployment on the same checks CI runs. A broken build should
+      # never reach the published site just because the push was to main.
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit and component tests
+        run: npm test
+
+      - name: Build static export
+        run: npm run build:static
+        env:
+          NEXT_PUBLIC_BASE_PATH: /zweaq.com
+          NEXT_PUBLIC_SITE_URL: https://kubegraf.github.io/zweaq.com
+
+      # GitHub Pages runs Jekyll over uploaded content unless told not to,
+      # which would strip the _next directory and break every asset.
+      - name: Disable Jekyll processing
+        run: touch out/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
