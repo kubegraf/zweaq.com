@@ -4,11 +4,25 @@ import { Mark } from '@/components/ui/Logo';
 /**
  * The ecosystem diagram.
  *
- * Positions are computed on a circle rather than hand-placed, so the layout
- * stays correct if the device list changes. Under the diagram, the same
- * information is a plain list — the SVG is not the only way to read it, and on
- * a narrow screen the list is the better one.
+ * Positions are computed rather than hand-placed, so the layout stays correct
+ * if the device list changes.
+ *
+ * The layout is an **ellipse, wider than tall**, not a circle. Labels are
+ * horizontal, so the nodes nearest the top and bottom are the ones that
+ * collide — on a circle, the two devices flanking the bottom overlap outright.
+ * Stretching the horizontal radius pushes exactly those apart and leaves the
+ * rest visually unchanged.
+ *
+ * Beneath it the same information is a plain list. The SVG is not the only way
+ * to read this, and on a narrow screen the list is the better one.
  */
+
+/** Ellipse radii, as a percentage of the container's half-size. */
+const LABEL_RX = 45;
+const LABEL_RY = 36;
+/** The same ellipse in the SVG's 400-unit coordinate space. */
+const LINE_RX = 168;
+const LINE_RY = 134;
 
 const DEVICES = [
   { name: 'iPhone', status: 'Planned' },
@@ -42,15 +56,15 @@ export function EcosystemSection() {
       <div className="mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:items-center lg:gap-14">
         <Reveal>
           <div
-            className="relative mx-auto aspect-square w-full max-w-[30rem]"
+            className="relative mx-auto aspect-[4/3.4] w-full max-w-[34rem]"
             role="img"
             aria-label={`ZWEAQ ONE at the centre, connected to ${DEVICES.map((d) => d.name).join(', ')}`}
           >
             <svg viewBox="0 0 400 400" className="absolute inset-0 h-full w-full">
               {DEVICES.map((device, i) => {
                 const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
-                const x = 200 + Math.cos(angle) * 150;
-                const y = 200 + Math.sin(angle) * 150;
+                const x = 200 + Math.cos(angle) * LINE_RX;
+                const y = 200 + Math.sin(angle) * LINE_RY;
                 return (
                   <line
                     key={device.name}
@@ -63,8 +77,8 @@ export function EcosystemSection() {
                   />
                 );
               })}
-              <circle cx="200" cy="200" r="150" fill="none" stroke="var(--line)" strokeWidth="1" />
-              <circle cx="200" cy="200" r="90" fill="none" stroke="var(--line)" strokeWidth="1" />
+              <ellipse cx="200" cy="200" rx={LINE_RX} ry={LINE_RY} fill="none" stroke="var(--line)" strokeWidth="1" />
+              <ellipse cx="200" cy="200" rx={LINE_RX * 0.6} ry={LINE_RY * 0.6} fill="none" stroke="var(--line)" strokeWidth="1" />
             </svg>
 
             <span className="absolute left-1/2 top-1/2 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--line-strong)] bg-ink text-paper">
@@ -77,10 +91,10 @@ export function EcosystemSection() {
                 <span
                   key={device.name}
                   aria-hidden="true"
-                  className="label-z absolute -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full border border-[var(--line-strong)] bg-ink px-2.5 py-1.5 text-ti-400"
+                  className="label-z absolute -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full border border-[var(--line-strong)] bg-ink px-2 py-1.5 text-ti-400"
                   style={{
-                    left: `${50 + Math.cos(angle) * 37.5}%`,
-                    top: `${50 + Math.sin(angle) * 37.5}%`,
+                    left: `${50 + Math.cos(angle) * LABEL_RX}%`,
+                    top: `${50 + Math.sin(angle) * LABEL_RY}%`,
                   }}
                 >
                   {device.name}

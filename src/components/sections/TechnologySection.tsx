@@ -30,7 +30,7 @@ export function TechnologySection() {
       }
       lede="Nine functional layers inside a band a few millimetres thick. The hard part of this product is not the software."
     >
-      <div className="mt-12 grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-14">
+      <div className="mt-12 grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start lg:gap-14">
         <Reveal>
           <ul
             className="flex flex-col gap-1.5"
@@ -69,7 +69,7 @@ export function TechnologySection() {
         </Reveal>
 
         <Reveal delay={100}>
-          <div className="flex h-full flex-col justify-center gap-8">
+          <div className="flex flex-col gap-8">
             {/* Cross-section: each layer as a band through the ring wall. */}
             <div
               className="flex flex-col gap-1 rounded-lg border border-[var(--line)] bg-ink-inset p-5"
