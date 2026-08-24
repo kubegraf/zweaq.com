@@ -29,21 +29,53 @@ const VIEWPORTS = [
 const PAGES = ['/', '/product/', '/technology/', '/security/', '/developers/', '/privacy/', '/terms/', '/cookies/', '/press/'];
 
 const server = spawn('node', ['scripts/serve-static.mjs', String(PORT)], {
-  stdio: 'ignore',
+  stdio: ['ignore', 'ignore', 'inherit'],
   detached: false,
 });
-const shutdown = () => { try { server.kill('SIGTERM'); } catch { /* already gone */ } };
+
+// A crash must fail the run, not end it quietly with a zero exit code.
+process.on('unhandledRejection', (error) => {
+  console.error('Visual QA failed:', error);
+  shutdownAndExit(1);
+});
+const shutdown = () => {
+  try {
+    server.kill('SIGTERM');
+  } catch {
+    /* already gone */
+  }
+};
+const shutdownAndExit = (code) => {
+  shutdown();
+  process.exit(code);
+};
 process.on('exit', shutdown);
 
 async function waitForServer() {
+  // If the child died — most often because the port was already taken — do not
+  // fall through and audit whatever else is listening there.
+  let exited = null;
+  server.on('exit', (code) => {
+    exited = code;
+  });
+
   for (let i = 0; i < 60; i += 1) {
+    if (exited !== null) {
+      console.error(
+        `The static server exited with code ${exited}. Port ${PORT} is probably in use.`,
+      );
+      process.exit(1);
+    }
     try {
       const res = await fetch(`${BASE}/`);
       if (res.ok) return;
-    } catch { /* not up yet */ }
+    } catch {
+      /* not up yet */
+    }
     await new Promise((r) => setTimeout(r, 500));
   }
-  throw new Error('static server did not start');
+  console.error('The static server did not start.');
+  process.exit(1);
 }
 
 await waitForServer();
@@ -187,4 +219,7 @@ if (findings.length === 0) {
   }
 }
 console.log(`Screenshots: ${OUT}/`);
-process.exit(0);
+
+// Exit non-zero on findings — otherwise the CI step that claims to gate on
+// this audit passes regardless of what the audit found.
+process.exit(findings.length === 0 ? 0 : 1);

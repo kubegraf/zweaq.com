@@ -70,6 +70,17 @@ const server = createServer((req, res) => {
   createReadStream(file).pipe(res);
 });
 
+server.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    // Silently sharing a port means auditing or testing whatever else is
+    // already serving there, which produces confidently wrong results.
+    console.error(`Port ${PORT} is already in use. Stop the other server first.`);
+    process.exit(1);
+  }
+  console.error(error);
+  process.exit(1);
+});
+
 server.listen(PORT, '127.0.0.1', () => {
   console.log(`Static export on http://127.0.0.1:${PORT}${BASE}/`);
 });
